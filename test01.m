@@ -20,7 +20,7 @@ f = 0.03;
 P = 2e5;    % Pa
 
 m = 16;       % Even integer, number of the pipeline segments
-N = m + 1;    % Number of the pipeline nodes
+M = m + 1;    % Number of the pipeline nodes
 dt = 0.00001; % Crazy small number ;-)
 dl = L / m;
 
@@ -45,19 +45,21 @@ subplot(2,1,2);
 h2 = plot(0,0);
 xlabel('$\ell$', 'Interpreter', 'latex')
 ylabel('$p(\ell)$', 'Interpreter', 'latex')
-ylim([0 P+0.2*P])
+ylim([0 P+0.25*P])
 
 T = 10;
 t = 0:dt:T;
-p_terminus = zeros(1, length(t));
+N = length(t);
+
+p_terminus = zeros(1, N);
 
 p_dot = zeros(1, m+1);
 v_dot = zeros(1, m+1);
 
 % The simulation starts here
-for k = 1 : length(t)                         
+for k = 1 : N
     
-    i = 2 : N-1;
+    i = 2 : M-1;
     v_dot(i) = -1/rho * (p(i+1)-p(i-1)) / (2*dl) - f/(2*D) .* ...
                abs(v(i)).*v(i);
     p_dot(i) = -rho*c^2 * (v(i+1)-v(i-1)) / (2*dl);  
@@ -66,8 +68,9 @@ for k = 1 : length(t)
     v = v_dot*dt + v;
 
     % Apply BC
-    v(N) = u_max - u_max / T * (k-1) * dt;           % See Sec. 4.1
-    p(N) = p(N) + dt * rho*c^2/dl * ( v(N-1)-v(N) );        
+    %v(M) = u_max - u_max / T * (k-1) * dt;           % See Sec. 4.1
+    v(M) = 0.5*u_max;
+    p(M) = p(M) + dt * rho*c^2/dl * ( v(M-1)-v(M) );        
 
     v(1) = v(1) + dt * ( 1/rho*dl*(P-p(2)) - f/(2*D)*v(1)*abs(v(1)) );    
     p(1) = P;                                
