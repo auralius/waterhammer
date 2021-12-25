@@ -12,3 +12,7 @@ Zhang, B., Wan, W., & Shi, M. (2018). Experimental and numerical simulation ofwa
 ![](https://github.com/auralius/waterhammer/blob/main/waterhammer-1.png)
 
 ![](https://github.com/auralius/waterhammer/blob/main/waterhammer-2.png)
+
+![](https://github.com/auralius/waterhammer/blob/main/waterhammer-3.png)
+
+![](https://github.com/auralius/waterhammer/blob/main/waterhammer-4.png)
