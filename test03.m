@@ -36,8 +36,8 @@ tau_0(end) = 1;
 % Run the optimization
 opts = optimoptions(@fmincon, ...
                    'Display','Iter',...
-                   'Algorithm','sqp');
-%                   'UseParallel','always');
+                   'Algorithm','sqp', ...
+                   'UseParallel','always');
 
 tic
 tau_opt = fmincon(@obj_fun, tau_0, [], [], [], [], lb, ub, [], opts);
