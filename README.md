@@ -3,7 +3,7 @@ Water hammer simulation and control
 
 Based on the paper by: 
 
-Zhang, B., Wan, W., & Shi, M. (2018). Experimental and numerical simulation ofwater hammer in gravitational pipe flow with continuous air entrainment. Water (Switzerland), 10(7). https://doi.org/10.3390/w10070928
+Chen, T., Xu, C., Lin, Q., Loxton, R., & Teo, K. L. (2015). Water hammer mitigation via PDE-constrained optimization. Control Engineering Practice, 45, 54–63. doi:10.1016/j.conengprac.2015.08.
 
 ![](https://github.com/auralius/waterhammer/blob/main/waterhammer.gif)
 
