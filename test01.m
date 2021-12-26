@@ -47,6 +47,8 @@ xlabel('$\ell$', 'Interpreter', 'latex')
 ylabel('$p(\ell)$', 'Interpreter', 'latex')
 ylim([0 P+0.25*P])
 
+set(gca,'fontname','times', 'FontSize', 12)  % Set it to times
+
 T = 10;
 t = 0:dt:T;
 N = length(t);
@@ -92,3 +94,4 @@ plot(t, p_terminus);
 title('Pressure at pipeline terminus')
 xlabel('Time (s)')
 ylabel('Pressure (Pa)')
+set(gca,'fontname','times', 'FontSize', 12)  % Set it to times

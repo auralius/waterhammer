@@ -43,10 +43,12 @@ for k = 1:M
     xlabel('Time(s)')
     legend('','Measurement points', 'Location','best')
 end
+set(gca,'fontname','times', 'FontSize', 12)  % Set it to times
 
 figure
 plot(l, P_hi(end,:), '--rs', 'MarkerEdgeColor', 'r', 'MarkerSize',10);
 xlabel('$\ell$', 'Interpreter','latex');
 ylabel('$p(\ell)$', 'Interpreter','latex');
 title('Pressure at t = 10s');
+set(gca,'fontname','times', 'FontSize', 12)  % Set it to times
 

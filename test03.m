@@ -55,41 +55,43 @@ plot(t1, p_data_optimized(:,end));
 xlabel('Time (s)')
 ylabel('P (Pa)')
 legend('Constant closure-rate', 'Optimal closure-rate', 'Location', 'best')
+set(gca,'fontname','times', 'FontSize', 12)  % Set it to times
 
 figure
 hold on 
 plot(0:1:10, 0:0.1:1);
 plot(0:1:10, tau_opt);
 xlabel('Time (s)')
-ylabel('Valve Closing')
+ylabel('Valve Closing ($\tau$)', 'Interpreter','latex');
 legend('Constant closure-rate', 'Optimal closure-rate', 'Location', 'best')
+set(gca,'fontname','times', 'FontSize', 12)  % Set it to times
 
 %% ------------------------------------------------------------------------
 %  Define the objective functions
 %  ------------------------------------------------------------------------
-function residuals = obj_fun(tau)
+function residual = obj_fun(tau)
 
-[t, l, p_data] = waterhammer_lo_time_res(tau);
+[~, ~, p_data] = waterhammer_lo_time_res(tau);
 
-N = size(p_data,1); % Should be 11
-M = size(p_data,2); 
+gamma   = 2;
+T       = 10;
+L       = 200;
+dt      = 0.00001;
+dl      = 12.5;
+p_ref   = 2e5;
+p_toll   = 1e4;
 
-gamma = 2;
-T = 10;
-L = 200;
-dt = 0.00001;
-dl = 12.5;
+% Intial 
+delta0 = ((p_data(:, 1) - p_ref) ./ p_toll) .^ (2*gamma);
+Sum0 = 1/T*sum(delta0)*dt;
 
-p_hat = ones(N,1) *2e5;
-P_bar = 1e5;
-p_at_terminus_over_time = p_data(:, end);
+% Terminal
+delta1 = ((p_data(:, end) - p_ref) ./ p_toll) .^ (2*gamma);
+Sum1 = 1/T*sum(delta1)*dt;
 
-delta = ((p_at_terminus_over_time - p_hat) ./ P_bar) .^ (2*gamma);
-Sum1 = sum(delta)*dt/T;
+% Stage
+delta2 = ((p_data - p_ref) ./ p_toll).^ (2*gamma);
+Sum2 = 1/(L*T)*sum(sum(delta2))*dl*dt;
 
-delta = ((p_data - p_hat) ./ P_bar) .^ (2*gamma);
-Sum2 = sum(sum(delta))*dl*dt / (L*T);
-
-residuals = Sum1 + Sum2;
-
+residual = Sum0 + Sum1 + Sum2;
 end
