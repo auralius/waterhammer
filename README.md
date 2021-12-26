@@ -16,3 +16,5 @@ Chen, T., Xu, C., Lin, Q., Loxton, R., & Teo, K. L. (2015). Water hammer mitigat
 ![](https://github.com/auralius/waterhammer/blob/main/waterhammer-3.png)
 
 ![](https://github.com/auralius/waterhammer/blob/main/waterhammer-4.png)
+
+![](https://github.com/auralius/waterhammer/blob/main/waterhammer-5.png)
