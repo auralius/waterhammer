@@ -73,7 +73,7 @@ for j = 1 : N
     v(M) = u_max - u_max * TAU(j);  % Apply the inputs                    
     p(M) = p(M) + dt * rho*c^2/dl * ( v(M-1)-v(M) );
 
-    v(1) = v(1) + dt * ( 1/rho*dl*(P-p(2)) - f/(2*D)*v(1)*abs(v(1)) );
+    v(1) = v(1) + dt * ( 1/(rho*dl)*(P-p(2)) - f/(2*D)*v(1)*abs(v(1)) );
     p(1) = P;
 
     % Log pressure every 1 second
