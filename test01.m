@@ -6,92 +6,54 @@
 % Water hammer mitigation via PDE-constrained optimization,
 % Control Engineering Practice,
 % Volume 45, 2015, pp. 54-63
+%
+% Here we will call to a matlab function that simulates the pipeline for 10
+% second. The pipline is segemnted into m equally spaced seggements,
+% resulting in m+1 measurement nodes. 
+%
+% The waterhammer function takes input in a vector (1xN), where N is the 
+% horizoon length. Each element describes the condition of valve, with 0 
+% means the valve is fully open and 1 means the valve is fully closed.
+%
+% 
+% This file also shows the measurement points along the pipeline.
+%
 
 clc
 close all
 clear
 
-% The parameters
-L = 200;    % m
-D = 100e-3; % m
-rho = 1000; % kg/m3
-c = 1200;   % m/s
-f = 0.03;
-P = 2e5;    % Pa
+%% Define the horizon
+dt = 1;
+Tf = 10;
+t = 0:dt:Tf;
+N = length(t); % Horizon length
 
-m = 16;       % Even integer, number of the pipeline segments
-M = m + 1;    % Number of the pipeline nodes
-dt = 0.00001; % Crazy small number ;-)
-dl = L / m;
+%%
+tau = 0:1/(N-1):1; % contant closure rate
+[l, t_hi, P_hi, t_lo, P_lo] = waterhammer(tau, dt);
 
-% Initial values for v
-u_max = 2;
-v = u_max*ones(1, m+1);  % See Sec. 4 of the referenced paper
 
-% Initial values for p
-l = linspace(0, L, m + 1);
-p = P - 2 * rho * f / D * l;
+M = size(P_hi,2);
 
-hfig = figure;
+for k = 1:M
+    s = ['Pipeline node #' num2str(k-1)];
+    figure;
+    plot(t_hi,P_hi(:,k))
+    hold on
+    plot(t_lo,P_lo(:,k), '--rs', 'MarkerEdgeColor', 'r', 'MarkerSize',10);
 
-subplot(2,1,1)
-h1 = plot(0,0);
-xlabel('$\ell$', 'Interpreter', 'latex')
-ylabel('$v(\ell)$', 'Interpreter', 'latex')
-htext = text(L/2, u_max/2, '');
-ylim([0 u_max])
-
-subplot(2,1,2);
-h2 = plot(0,0);
-xlabel('$\ell$', 'Interpreter', 'latex')
-ylabel('$p(\ell)$', 'Interpreter', 'latex')
-ylim([0 P+0.25*P])
-
-set(gca,'fontname','times', 'FontSize', 12)  % Set it to times
-
-T = 10;
-t = 0:dt:T;
-N = length(t);
-
-p_terminus = zeros(1, N);
-
-p_dot = zeros(1, m+1);
-v_dot = zeros(1, m+1);
-
-% The simulation starts here
-for k = 1 : N
-    
-    i = 2 : M-1;
-    v_dot(i) = -1/rho * (p(i+1)-p(i-1)) / (2*dl) - f/(2*D) .* ...
-               abs(v(i)).*v(i);
-    p_dot(i) = -rho*c^2 * (v(i+1)-v(i-1)) / (2*dl);  
-
-    p = p_dot*dt + p;
-    v = v_dot*dt + v;
-
-    % Apply BC
-    %v(M) = u_max - u_max / T * (k-1) * dt;           % See Sec. 4.1
-    v(M) = 0.5*u_max;
-    p(M) = p(M) + dt * rho*c^2/dl * ( v(M-1)-v(M) );        
-
-    v(1) = v(1) + dt * ( 1/rho*dl*(P-p(2)) - f/(2*D)*v(1)*abs(v(1)) );    
-    p(1) = P;                                
-
-    if (rem((k-1), 0.1/dt) == 0) % Write to a GIF file every 0.1s
-        set(h1, 'XData', l, 'YData',v);
-        set(h2, 'XData', l, 'YData',p);
-        drawnow;       
-        htext.String = ['t = ', num2str((k-1)*dt)];
-        write2gif(hfig, k, 'waterhammer.gif', 0.1);
-    end
-
-    % Log pressure at the valve
-    p_terminus(k) = p(m);
+    title(s);
+    ylabel('Pressure (Pa)')
+    xlabel('Time(s)')
+    legend('','Measurement points', 'Location','best')
 end
+set(gca,'fontname','times', 'FontSize', 12)  % Set it to times
 
 figure
-plot(t, p_terminus);
-title('Pressure at pipeline terminus')
-xlabel('Time (s)')
-ylabel('Pressure (Pa)')
+plot(l, P_hi(end,:), '--rs', 'MarkerEdgeColor', 'r', 'MarkerSize',10);
+xlabel('$\ell$', 'Interpreter','latex');
+ylabel('$p(\ell)$', 'Interpreter','latex');
+title('Pressure along the pipe after 10 seconds');
 set(gca,'fontname','times', 'FontSize', 12)  % Set it to times
+
