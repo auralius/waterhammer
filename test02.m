@@ -42,16 +42,16 @@ tau_0 = lb;
 
 target = @(tau)(obj_fun_runner(tau, dt));
 
+tic
+
 % Run the optimization
 if strcmp(SOLVER, 'sqp')
     opts = optimoptions(@fmincon, ...
-        'Display', 'none', ...
+        'Display', 'iter', ...
         'Algorithm', 'sqp', ...
+        'UseParallel', true, ...
         'SpecifyObjectiveGradient', true);
-    ms = MultiStart('Display','iter', 'UseParallel', true);
-    problem = createOptimProblem('fmincon', 'x0', tau_0, ...
-              'objective', target, 'lb', lb, 'ub', ub, 'options', opts);
-    tau_opt = run(ms, problem, 30);    
+    tau_opt = fmincon(target, tau_0, [], [], [], [], lb, ub, [], opts);;    
 
 elseif strcmp(SOLVER, 'ps')
     opts = optimoptions('patternsearch', ...
@@ -68,11 +68,13 @@ elseif strcmp(SOLVER, 'pdfo')
     tau_opt = pdfo(target, tau_0, [], [], [], [], lb, ub, [], opts);
 end
 
-% Simulate the optimum control inputs and compa
+toc
 
+% Simulate the optimum control inputs and compare the results
 [~, t1, p_data_optimized, ~, ~] = waterhammer(tau_opt, dt);
 [~, t2, p_data_unoptimized, ~, ~] = waterhammer(0:1/(N-1):1, dt); % This is contant closure rate
 
+% Plot the results
 figure
 hold on
 plot(t2, p_data_unoptimized(:,end));
@@ -91,49 +93,3 @@ ylabel('Valve Closing ($\tau$)', 'Interpreter','latex');
 legend('Constant closure-rate', 'Optimal closure-rate', 'Location', 'best')
 set(gca,'fontname','times', 'FontSize', 12)  % Set it to Times
 
-%% ------------------------------------------------------------------------
-%  Define the objective functions
-%  ------------------------------------------------------------------------
-function [J, grad_J] = obj_fun_runner(tau, dt)
-
-[~, ~, ~, ~, p] = waterhammer(tau, dt);
-J = obj_fun(p, dt);
-
-if nargout > 1 % gradient required
-    epsilon = 1e-3;
-    epsilon_inv = 1/epsilon;
-
-    grad_J = zeros(length(tau), 1);
-
-    for k = 1 : length(tau)
-        tau_ = tau;
-        tau_(k) = tau(k) + epsilon * 1i;
-        [~, ~, ~, ~, p_] = waterhammer(tau_, dt);
-        J_ = obj_fun(p_, dt);
-        grad_J(k) = imag(J_).*epsilon_inv;
-    end
-end
-
-end
-
-%% See Eq. 7 of the paper
-function J = obj_fun(p, dt)
-
-gamma   = 2;
-T       = 10;
-L       = 200;
-m       = 16;
-dl      = L/m;
-p_ref   = 2e5;
-p_toll  = 1e5;
-
-% Terminal
-delta1 = ((p(:,end) - p_ref) ./ p_toll) .^ (2*gamma);
-Sum1 = 1/T*sum(delta1)*dt;
-
-% Stage
-delta2 = ((p - p_ref) ./ p_toll).^ (2*gamma);
-Sum2 = 1/(L*T)*sum(sum(delta2))*dl*dt;
-
-J = Sum1 + Sum2;
-end

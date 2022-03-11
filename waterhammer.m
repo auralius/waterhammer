@@ -34,22 +34,19 @@ dl = L / m;   % Per-segment length
 
 % Initial values for v
 u_max = 2;
-v = u_max*ones(1, M);  % See Sec. 4 of the referenced paper
+v0 = u_max*ones(1, M);  % See Sec. 4 of the referenced paper
 
 % Initial values for p, see the paper, p. 60. Section. 4
 l = linspace(0, L, m + 1);
-p = P - 2 * rho * f / D * l;
+p0 = P - 2 * rho * f / D * l;
 
 Tf = 10;
 hires_dt = 0.001;  % For plotting only, so we can have a smooth plot
 hires_tspan = 0:hires_dt:Tf; 
 lores_tspan = 0:dt:Tf;
 
-p_dot = zeros(1, M);
-v_dot = zeros(1, M);
-
 % The simulation starts here
-[~,xsol] = ode23(@rhs, hires_tspan, [p v]);
+[~,xsol] = ode23(@rhs, hires_tspan, [p0 v0]);
 hires_p = xsol(:,1:M);                 % Timestep: hires_dt
 lores_p = xsol(1:dt/hires_dt:end,1:M); % Downsamped solutions, timestep: dt
 

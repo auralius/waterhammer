@@ -30,9 +30,10 @@ t = 0:dt:Tf;
 N = length(t); % Horizon length
 
 %%
-tau = 0:1/(N-1):1; % contant closure rate
+tau = 0:1/(N-1):1; % contant closure rate, see Section 4.1 of the paper
+tic
 [l, t_hi, P_hi, t_lo, P_lo] = waterhammer(tau, dt);
-
+toc
 
 M = size(P_hi,2);
 
